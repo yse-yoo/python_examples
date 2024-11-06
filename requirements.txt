@@ -4,3 +4,4 @@ pygame
 scikit-learn
 numpy
 matplotlib
+onnxruntime
