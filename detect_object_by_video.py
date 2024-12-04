@@ -59,28 +59,25 @@ def letterbox(srcimg, target_size=(416, 416)):
 def vis(preds, res_img, letterbox_scale, fps=None):
     ret = res_img.copy()
 
-    # Draw FPS
-    if fps is not None:
-        fps_label = "FPS: %.2f" % fps
-        cv.putText(ret, fps_label, (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    # ラベルを左上に表示
+    label_y_position = 50  # 最初のラベルのY位置
+    label_spacing = 30     # ラベル間のスペース
 
-    # Draw labels without bounding boxes
     for pred in preds:
-        bbox = pred[:4]
         conf = pred[-2]
-        classid = pred[-1].astype(np.int32)
-
-        # Label text with confidence
-        label = "{:s}: {:.2f}".format(classes[classid], conf)
-        xmin, ymin, _, _ = bbox.astype(int)
-        
-        # Display label above the bounding box position
-        cv.putText(ret, label, (xmin, ymin - 10), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), thickness=2)
+        if conf >= 0.6:  # 60%以上の場合のみラベルを表示
+            classid = pred[-1].astype(np.int32)
+            label = "{:s}: {:.2f}".format(classes[classid], conf)
+            
+            # 左上に順番にラベルを表示
+            cv.putText(ret, label, (18, label_y_position), cv.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
+            label_y_position += label_spacing  # 次のラベルのY位置を更新
 
     return ret
 
+
 if __name__ == '__main__':
-    video_path = 'videos/crow.mp4'
+    video_path = 'videos/ng2.mp4'
     model_path = 'object_detection_nanodet_2022nov.onnx'
 
     backend_id = cv.dnn.DNN_BACKEND_OPENCV  # CPUを使用
